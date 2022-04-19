@@ -1,4 +1,6 @@
-package com.yhzdys.cache.simple.lock;
+package com.yhzdys.cache.simple.lock.none;
+
+import com.yhzdys.cache.simple.lock.Lock;
 
 public class NoneLock implements Lock {
 

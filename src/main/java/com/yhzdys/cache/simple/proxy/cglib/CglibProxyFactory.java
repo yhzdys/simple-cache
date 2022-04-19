@@ -12,8 +12,9 @@ public class CglibProxyFactory extends AbstractProxyFactory {
     public Object proxy(Object target) {
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(target.getClass());
-        // TODO
         CglibProxy proxy = new CglibProxy();
+
+        // TODO 需要动态加载cacheManager，考虑引入SPI机制?
         proxy.setCacheManager(new LocalCacheManager());
 
         enhancer.setCallback(proxy);

@@ -8,14 +8,13 @@ import redis.clients.jedis.JedisPool;
 
 public class RedisCacheManager implements CacheManager {
     private static final GenericObjectPoolConfig<Jedis> jedisPoolConfig = new GenericObjectPoolConfig<>();
+    private static final JedisPool jedisPool = new JedisPool(jedisPoolConfig, "127.0.0.1", 6379);
 
     static {
         jedisPoolConfig.setMinIdle(2);
         jedisPoolConfig.setMaxIdle(4);
         jedisPoolConfig.setMaxTotal(32);
     }
-
-    private static final JedisPool jedisPool = new JedisPool(jedisPoolConfig, "127.0.0.1", 6379);
 
     @Override
     public void set(String key, Object value) {

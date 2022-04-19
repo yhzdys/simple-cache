@@ -17,7 +17,7 @@ public class CglibProxy implements MethodInterceptor {
     }
 
     public Object intercept(Object target, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-        // TODO
+        // TODO 当前仅是简单的实现，待补全逻辑（分组\刷新\清除...）
         CacheAble cacheAble = method.getAnnotation(CacheAble.class);
         if (cacheAble == null) {
             return methodProxy.invokeSuper(target, args);

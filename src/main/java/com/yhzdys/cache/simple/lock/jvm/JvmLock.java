@@ -1,14 +1,15 @@
-package com.yhzdys.cache.simple.lock;
+package com.yhzdys.cache.simple.lock.jvm;
 
 import com.yhzdys.cache.simple.exception.LockFailedException;
 import com.yhzdys.cache.simple.exception.LockTimeoutException;
+import com.yhzdys.cache.simple.lock.Lock;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class InJvmLock implements Lock {
+public class JvmLock implements Lock {
     private static final Map<String, ReentrantLock> _lockCache = new ConcurrentHashMap<>(128);
 
     public void lock(String session) {
