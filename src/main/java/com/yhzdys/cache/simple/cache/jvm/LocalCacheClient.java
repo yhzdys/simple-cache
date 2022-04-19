@@ -1,4 +1,6 @@
-package com.yhzdys.cache.simple.cache;
+package com.yhzdys.cache.simple.cache.jvm;
+
+import com.yhzdys.cache.simple.cache.CacheClient;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,12 +1,11 @@
-package com.yhzdys.cache.simple.manager.redis;
+package com.yhzdys.cache.simple.manager.local.jvm;
 
 import com.yhzdys.cache.simple.cache.CacheClient;
-import com.yhzdys.cache.simple.cache.redis.RedisCacheClient;
-import com.yhzdys.cache.simple.manager.CacheManager;
+import com.yhzdys.cache.simple.cache.jvm.LocalCacheClient;
+import com.yhzdys.cache.simple.manager.local.AbstractLocalCacheManager;
 
-public class RedisCacheManager implements CacheManager {
-    private static final CacheClient cacheClient = new RedisCacheClient();
-
+public class JvmCacheManager extends AbstractLocalCacheManager {
+    private final CacheClient cacheClient = new LocalCacheClient();
 
     @Override
     public void set(String key, Object value) {
@@ -22,4 +21,5 @@ public class RedisCacheManager implements CacheManager {
     public void del(String key) {
         cacheClient.del(key);
     }
+
 }
