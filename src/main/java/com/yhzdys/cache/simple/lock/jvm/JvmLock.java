@@ -1,37 +1,42 @@
 package com.yhzdys.cache.simple.lock.jvm;
 
-import com.yhzdys.cache.simple.exception.LockFailedException;
-import com.yhzdys.cache.simple.exception.LockTimeoutException;
 import com.yhzdys.cache.simple.lock.Lock;
+import com.yhzdys.cache.simple.lock.LockSession;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class JvmLock implements Lock {
-    private static final Map<String, ReentrantLock> _lockCache = new ConcurrentHashMap<>(128);
+public class JvmLock extends ReentrantLock implements Lock {
+    private final LockSession session;
+    private Long lastUsedTime;
 
-    public void lock(String session) {
-        ReentrantLock lock = _lockCache.computeIfAbsent(
-                session,
-                // 使用公平锁，减少部分锁超时问题
-                rLock -> new ReentrantLock(true)
-        );
-        try {
-            boolean result = lock.tryLock(40000, TimeUnit.SECONDS);
-            if (!result) {
-                throw new LockFailedException(session);
-            }
-        } catch (InterruptedException e) {
-            throw new LockTimeoutException(session);
-        } catch (Exception e) {
-            throw new LockFailedException(session);
-        }
+    public JvmLock(LockSession session) {
+        // 使用公平锁，减少部分锁超时问题
+        super(true);
+        this.session = session;
+        refresh();
     }
 
-    public void unlock(String session) {
-        _lockCache.get(session).unlock();
+    public Long getLastUsedTime() {
+        return lastUsedTime;
+    }
+
+    public void setLastUsedTime(Long lastUsedTime) {
+        this.lastUsedTime = lastUsedTime;
+    }
+
+    @Override
+    public void lock() {
+        refresh();
+        super.lock();
+    }
+
+    private void refresh() {
+        this.lastUsedTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void unlock() {
+        super.unlock();
     }
 
 }

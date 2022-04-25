@@ -2,6 +2,7 @@ package com.yhzdys.cache.simple;
 
 import com.yhzdys.cache.simple.lock.Lock;
 import com.yhzdys.cache.simple.lock.LockFactory;
+import com.yhzdys.cache.simple.lock.LockSession;
 import com.yhzdys.cache.simple.lock.LockType;
 import com.yhzdys.cache.simple.manager.CacheManager;
 import com.yhzdys.cache.simple.manager.redis.RedisCacheManager;
@@ -35,23 +36,25 @@ public class LockTest {
                 System.out.println("thread: " + getName() + " get cache value: " + value);
                 return;
             }
-            Lock lock = LockFactory.getLock(LockType.IN_JVM);
             String session = "session" + key;
+            Lock lock = LockFactory.getLock(LockType.IN_JVM, new LockSession(session));
+            System.out.println("lock: " + lock);
+
             try {
-                lock.lock(session);
+                lock.lock();
                 value = cacheManager.get(key);
                 // double check
                 if (value != null) {
                     System.out.println("thread: " + getName() + " get cache value2: " + value);
-
-                    lock.unlock(session);
+                    lock.unlock();
                     return;
                 }
                 System.out.println("thread: " + getName() + " set cache");
                 cacheManager.set(key, getName());
-                lock.unlock(session);
+                lock.unlock();
+
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         }
     }

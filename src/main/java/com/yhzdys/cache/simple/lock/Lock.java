@@ -2,8 +2,8 @@ package com.yhzdys.cache.simple.lock;
 
 public interface Lock {
 
-    void lock(String session);
+    void lock() throws Exception;
 
-    void unlock(String session);
+    void unlock();
 
 }

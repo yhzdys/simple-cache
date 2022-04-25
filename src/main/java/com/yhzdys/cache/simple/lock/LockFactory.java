@@ -1,33 +1,36 @@
 package com.yhzdys.cache.simple.lock;
 
 import com.yhzdys.cache.simple.exception.UnsupportedLockTypeException;
-import com.yhzdys.cache.simple.lock.jvm.JvmLock;
+import com.yhzdys.cache.simple.lock.jvm.JvmLockStore;
 import com.yhzdys.cache.simple.lock.none.NoneLock;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class LockFactory {
-    private static final Map<LockType, Lock> lockMap = new HashMap<>(4);
-    private static final Object lockObject = new Object();
+    private static final Map<LockType, LockStore> lockStores = new HashMap<>(4);
+    private static final Object storeLock = new Object();
 
-    public static Lock getLock(LockType type) {
-        Lock lock = lockMap.get(type);
-        if (lock != null) return lock;
-        synchronized (lockObject) {
-            lock = lockMap.get(type);
-            if (lock != null) return lock;
-            lockMap.put(type, createLock(type));
+    public static Lock getLock(LockType type, LockSession lockSession) {
+        if (LockType.NONE.equals(type)) return NoneLock._instance;
+
+        LockStore lockStore = lockStores.get(type);
+        if (lockStore != null) return lockStore.getLock(lockSession);
+
+        synchronized (storeLock) {
+            lockStore = lockStores.get(type);
+            // double check
+            if (lockStore == null) {
+                lockStore = createLockStore(type);
+                lockStores.put(type, lockStore);
+            }
         }
-        return lock;
+        return lockStore.getLock(lockSession);
     }
 
-    private static Lock createLock(LockType type) {
-        if (LockType.NONE.equals(type)) {
-            return new NoneLock();
-        }
+    private static LockStore createLockStore(LockType type) {
         if (LockType.IN_JVM.equals(type)) {
-            return new JvmLock();
+            return new JvmLockStore();
         }
         throw new UnsupportedLockTypeException(type);
     }

@@ -3,11 +3,15 @@ package com.yhzdys.cache.simple.lock.none;
 import com.yhzdys.cache.simple.lock.Lock;
 
 public class NoneLock implements Lock {
+    public static final NoneLock _instance = new NoneLock();
 
-    public void lock(String session) {
+    @Override
+    public void lock() throws Exception {
+
     }
 
-    public void unlock(String session) {
-    }
+    @Override
+    public void unlock() {
 
+    }
 }

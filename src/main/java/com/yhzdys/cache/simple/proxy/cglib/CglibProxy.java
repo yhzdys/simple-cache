@@ -3,6 +3,8 @@ package com.yhzdys.cache.simple.proxy.cglib;
 import com.yhzdys.cache.simple.annotation.CacheAble;
 import com.yhzdys.cache.simple.lock.Lock;
 import com.yhzdys.cache.simple.lock.LockFactory;
+import com.yhzdys.cache.simple.lock.LockSession;
+import com.yhzdys.cache.simple.lock.LockType;
 import com.yhzdys.cache.simple.manager.CacheManager;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
@@ -26,18 +28,20 @@ public class CglibProxy implements MethodInterceptor {
         if (cacheValue != null) {
             return cacheValue;
         }
-        Lock lock = LockFactory.getLock(cacheAble.lock());
         String session = "lock-session-" + cacheAble.key();
-        lock.lock(session);
+        LockType lockType = cacheAble.lock();
+        Lock lock = LockFactory.getLock(lockType, new LockSession(session));
+
+        lock.lock();
         // double check
         cacheValue = cacheManager.get(cacheAble.key());
         if (cacheValue != null) {
-            lock.unlock(session);
+            lock.unlock();
             return cacheValue;
         }
         cacheValue = methodProxy.invokeSuper(target, args);
         cacheManager.set(cacheAble.key(), cacheValue);
-        lock.unlock(session);
+        lock.unlock();
         return cacheValue;
     }
 
